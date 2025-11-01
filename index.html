@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Internship Recommendation Engine</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      background: #0d1117;
+      color: #e6edf3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    header {
+      width: 100%;
+      text-align: center;
+      padding: 2rem 1rem;
+      background: #161b22;
+      border-bottom: 1px solid #30363d;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      color: #58a6ff;
+    }
+
+    header p {
+      color: #8b949e;
+      margin-top: 0.4rem;
+    }
+
+    main {
+      background: #161b22;
+      margin: 2rem;
+      padding: 2rem;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 700px;
+      box-shadow: 0 0 12px rgba(88, 166, 255, 0.1);
+      text-align: center;
+    }
+
+    main h2 {
+      color: #58a6ff;
+      margin-bottom: 1rem;
+    }
+
+    main p {
+      color: #c9d1d9;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+
+    .upload-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    input[type="file"], textarea {
+      background: #0d1117;
+      border: 1px solid #30363d;
+      padding: 0.7rem;
+      border-radius: 8px;
+      color: #e6edf3;
+      cursor: pointer;
+      width: 80%;
+      resize: none;
+    }
+
+    input[type="file"]::file-selector-button {
+      background: #238636;
+      color: #fff;
+      border: none;
+      padding: 0.4rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    input[type="file"]::file-selector-button:hover {
+      background: #2ea043;
+    }
+
+    .btn {
+      background: #238636;
+      border: none;
+      padding: 0.8rem 1.8rem;
+      color: #fff;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.3s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn:hover {
+      background: #2ea043;
+      transform: scale(1.05);
+    }
+
+    #result {
+      margin-top: 1rem;
+      color: #58a6ff;
+      font-size: 1.1rem;
+    }
+
+    footer {
+      text-align: center;
+      color: #8b949e;
+      padding: 1rem;
+      border-top: 1px solid #30363d;
+      width: 100%;
+      margin-top: auto;
+      background: #161b22;
+    }
+
+    /* Chatbot */
+    .chatbot-btn {
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      background: #238636;
+      border: none;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      transition: 0.3s;
+      z-index: 1000;
+    }
+
+    .chatbot-btn:hover {
+      background: #2ea043;
+      transform: scale(1.1);
+    }
+
+    .chat-window {
+      display: none;
+      position: fixed;
+      bottom: 100px;
+      right: 25px;
+      width: 320px;
+      height: 400px;
+      background: #161b22;
+      color: #e6edf3;
+      border: 1px solid #30363d;
+      border-radius: 10px;
+      overflow: hidden;
+      flex-direction: column;
+      z-index: 1001;
+    }
+
+    .chat-header {
+      background: #238636;
+      color: #fff;
+      padding: 0.8rem;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .chat-body {
+      flex: 1;
+      padding: 0.8rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .message {
+      padding: 0.6rem 0.9rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      max-width: 80%;
+    }
+
+    .user-message {
+      background: #238636;
+      align-self: flex-end;
+      color: #fff;
+    }
+
+    .bot-message {
+      background: #30363d;
+      align-self: flex-start;
+      color: #e6edf3;
+    }
+
+    .chat-input {
+      display: flex;
+      border-top: 1px solid #30363d;
+    }
+
+    .chat-input input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      padding: 0.8rem;
+      color: #e6edf3;
+      outline: none;
+    }
+
+    .chat-input button {
+      background: #238636;
+      color: #fff;
+      border: none;
+      padding: 0.8rem 1rem;
+      cursor: pointer;
+    }
+
+    .chat-input button:hover {
+      background: #2ea043;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>AI Internship Recommendation Engine</h1>
+    <p>For PM Internship Scheme</p>
+  </header>
+
+  <main>
+    <h2>Find the Right Internship with AI</h2>
+    <p>
+      Upload your CV and describe your skills or interests — our AI will analyze
+      your input and instantly recommend the best internships for you.
+    </p>
+
+    <div class="upload-section">
+      <input type="file" id="cvUpload" accept=".pdf,.doc,.docx" />
+      <textarea id="intro" rows="4" placeholder="Write a short introduction or list your skills..."></textarea>
+      <button class="btn" id="uploadBtn">Analyze & Recommend</button>
+    </div>
+
+    <a href="positions.html" class="btn">View Available Positions</a>
+    <div id="result"></div>
+  </main>
+
+  <button class="chatbot-btn" id="chatbotToggle">💬</button>
+
+  <div class="chat-window" id="chatWindow">
+    <div class="chat-header">AI Assistant</div>
+    <div class="chat-body" id="chatBody">
+      <div class="bot-message message">
+        Hello 👋! I'm your assistant. How can I help you today?
+      </div>
+    </div>
+    <div class="chat-input">
+      <input type="text" id="userInput" placeholder="Type a message..." />
+      <button id="sendBtn">Send</button>
+    </div>
+  </div>
+
+  <footer>
+    © 2025 AI Internship Recommendation | Developed by Saurav
+  </footer>
+
+  <script>
+    // Chatbot functionality
+    const chatbotToggle = document.getElementById("chatbotToggle");
+    const chatWindow = document.getElementById("chatWindow");
+    const sendBtn = document.getElementById("sendBtn");
+    const userInput = document.getElementById("userInput");
+    const chatBody = document.getElementById("chatBody");
+
+    chatbotToggle.addEventListener("click", () => {
+      chatWindow.style.display = chatWindow.style.display === "flex" ? "none" : "flex";
+    });
+
+    function sendMessage() {
+      const msg = userInput.value.trim();
+      if (!msg) return;
+
+      const userMsg = document.createElement("div");
+      userMsg.classList.add("message", "user-message");
+      userMsg.textContent = msg;
+      chatBody.appendChild(userMsg);
+      userInput.value = "";
+
+      setTimeout(() => {
+        const botMsg = document.createElement("div");
+        botMsg.classList.add("message", "bot-message");
+        let reply = "I'm here to assist you.";
+
+        if (msg.toLowerCase().includes("cv")) reply = "Please upload your CV using the green button above.";
+        else if (msg.toLowerCase().includes("internship")) reply = "You can explore internships under 'View Available Positions'.";
+        else if (msg.toLowerCase().includes("hi") || msg.toLowerCase().includes("hello")) reply = "Hi there 👋! Ready to find your perfect internship?";
+        else if (msg.toLowerCase().includes("recommend")) reply = "Upload your CV and I’ll analyze it to recommend the right internship.";
+        else if (msg.toLowerCase().includes("thanks")) reply = "You're welcome 😊";
+
+        botMsg.textContent = reply;
+        chatBody.appendChild(botMsg);
+        chatBody.scrollTop = chatBody.scrollHeight;
+      }, 600);
+    }
+
+    sendBtn.addEventListener("click", sendMessage);
+    userInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") sendMessage();
+    });
+
+    // AI Recommendation Simulation
+    document.getElementById("uploadBtn").addEventListener("click", () => {
+      const intro = document.getElementById("intro").value.toLowerCase();
+      const resultDiv = document.getElementById("result");
+
+      if (!intro.trim()) {
+        resultDiv.textContent = "Please enter some details about yourself.";
+        return;
+      }
+
+      resultDiv.innerHTML = "Analyzing your input...";
+
+      setTimeout(() => {
+        let recommendations = [];
+
+        if (intro.includes("web") || intro.includes("developer") || intro.includes("html") || intro.includes("css") || intro.includes("python") || intro.includes("java"))
+          recommendations = ["Information Technology", "Engineering", "Digital Media"];
+        else if (intro.includes("finance") || intro.includes("account") || intro.includes("bank"))
+          recommendations = ["Finance", "Banking", "Business Development"];
+        else if (intro.includes("design") || intro.includes("ui") || intro.includes("photoshop") || intro.includes("figma"))
+          recommendations = ["Design", "Digital Media", "Creative Content"];
+        else if (intro.includes("marketing") || intro.includes("sales") || intro.includes("communication"))
+          recommendations = ["Public Relations", "Marketing", "Business Development"];
+        else if (intro.includes("teacher") || intro.includes("education"))
+          recommendations = ["Teaching", "Consultancy", "HR"];
+        else if (intro.includes("health") || intro.includes("fitness"))
+          recommendations = ["Healthcare", "Consultancy", "Public Service"];
+        else
+          recommendations = ["Consultancy", "Public Relations", "Digital Media"];
+
+        resultDiv.innerHTML = `
+          <strong>Recommended Internships:</strong>
+          <ul>${recommendations.map(r => `<li>${r}</li>`).join("")}</ul>
+        `;
+      }, 1200);
+    });
+  </script>
+</body>
+</html>
